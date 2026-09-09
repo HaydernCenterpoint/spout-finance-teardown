@@ -1,11 +1,196 @@
 <!doctype html>
-<meta charset="utf-8">
-<title>Spout Finance beta teardown</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-  body { font: 16px/1.45 system-ui, sans-serif; max-width: 72ch; margin: 2rem auto; padding: 0 1rem; color: #111; }
-  a { color: #0b57d0; }
-</style>
-<p>Public Superteam writeup for <a href="https://superteam.fun/earn/listing/product-feedback-spout-finance/">Product Feedback Spout Finance</a>.</p>
-<p>Canonical markdown: <a href="https://github.com/HaydernCenterpoint/spout-finance-teardown/blob/master/REPORT.md">REPORT.md</a></p>
-<iframe src="https://raw.githack.com/HaydernCenterpoint/spout-finance-teardown/master/REPORT.md" style="width:100%;min-height:80vh;border:0"></iframe>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spout Finance beta teardown — Superteam Product Feedback</title>
+  <meta name="description" content="Public teardown of Spout Finance: 0% APR vs ITM call give-up, KYC Path A vs Path B, lockups, Health Factor copy, and live HTTP evidence.">
+  <style>
+    :root {
+      --ink: #111;
+      --muted: #4a4a4a;
+      --line: #d8d8d8;
+      --bg: #f7f6f2;
+      --card: #fff;
+      --bad: #8b1e1e;
+      --ok: #1b5e20;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font: 17px/1.5 "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    }
+    header, main, footer { max-width: 44rem; margin: 0 auto; padding: 0 1.25rem; }
+    header { padding-top: 2.5rem; padding-bottom: 1.5rem; }
+    .kicker { font: 12px/1.3 ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+    h1 { font-size: 2rem; line-height: 1.15; margin: .4rem 0 1rem; font-weight: 650; }
+    h2 { font-size: 1.25rem; margin: 2.2rem 0 .6rem; }
+    h3 { font-size: 1.05rem; margin: 1.4rem 0 .4rem; }
+    p, li { max-width: 70ch; }
+    a { color: #0b57d0; }
+    .meta { color: var(--muted); font-size: .95rem; }
+    .box {
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 1rem 1.1rem;
+      margin: 1rem 0 1.4rem;
+    }
+    .bad { color: var(--bad); font-weight: 650; }
+    .ok { color: var(--ok); font-weight: 650; }
+    table { width: 100%; border-collapse: collapse; font-size: .92rem; background: var(--card); margin: .6rem 0 1rem; }
+    th, td { border: 1px solid var(--line); padding: .45rem .55rem; text-align: left; vertical-align: top; }
+    th { background: #efece6; font-weight: 650; }
+    code, .mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .88em; }
+    ul { padding-left: 1.2rem; }
+    nav a { display: inline-block; margin: .15rem .7rem .15rem 0; font-size: .92rem; }
+    footer { padding: 2rem 1.25rem 3rem; color: var(--muted); font-size: .9rem; }
+    @media print {
+      body { background: #fff; }
+      header, main { max-width: none; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <p class="kicker">Superteam Earn · Product Feedback · 0 submissions when last checked</p>
+    <h1>Spout Finance beta teardown</h1>
+    <p class="meta">
+      Listing: <a href="https://superteam.fun/earn/listing/product-feedback-spout-finance/">product-feedback-spout-finance</a><br>
+      Deadline: 21 Sep 2026 22:59 UTC · Prizes: 250 / 200 / 150 / 100×4 USDC<br>
+      Canonical markdown: <a href="https://github.com/HaydernCenterpoint/spout-finance-teardown/blob/master/REPORT.md">REPORT.md</a>
+      · Repo: <a href="https://github.com/HaydernCenterpoint/spout-finance-teardown">HaydernCenterpoint/spout-finance-teardown</a>
+    </p>
+    <div class="box">
+      <strong>Submit this URL on Superteam (logged-in web, HUMAN_ONLY):</strong><br>
+      <a href="https://hayderncenterpoint.github.io/spout-finance-teardown/">https://hayderncenterpoint.github.io/spout-finance-teardown/</a>
+      <p style="margin:.6rem 0 0">Eligibility answer: gated beta + KYC Path A. This teardown is from public demo, docs, and marketing contradictions. An invite code would unlock a live testnet borrow.</p>
+    </div>
+    <nav>
+      <a href="#good">What is good</a>
+      <a href="#bugs">Bugs</a>
+      <a href="#http">HTTP log</a>
+      <a href="#defi">DeFi analysis</a>
+      <a href="#fix">Recommendations</a>
+    </nav>
+  </header>
+  <main>
+    <p>Surfaces used: <a href="https://www.spout.finance/">www.spout.finance</a>,
+      <a href="https://spout.finance/docs/getting-started">docs/getting-started</a>,
+      <a href="https://spout.finance/docs/health-factor">docs/health-factor</a>,
+      <a href="https://spout.finance/llms-full.txt">llms-full.txt</a>,
+      <a href="https://demo.spout.finance/">demo.spout.finance</a>,
+      <a href="https://beta.spout.finance/">beta.spout.finance</a>.</p>
+    <p>Wallet/KYC: not completed. This is a docs + public-demo audit, not a funded mainnet trade.</p>
+
+    <h2>One-line product</h2>
+    <p>Spout is a Solana DeFi prime-brokerage pitch: tokenized US equities as collateral, 0% stated borrow APR, lender yield from writing covered calls on that collateral.</p>
+
+    <h2 id="good">What is actually good</h2>
+    <ul>
+      <li>The economic story is clearer than most RWA lending pages. “Borrower does not pay interest; option premium pays lenders” is a real TradFi structure (covered-call overwriting), not a mystery token emission.</li>
+      <li>50% max LTV + a liquidation threshold <em>above</em> that LTV is the right shape. Opening Health Factor &gt; 1.00 is honest.</li>
+      <li>Path B in the docs (deposit existing xStocks / Ondo, no extra Spout KYC) is the only way a crypto-native tester can actually touch the product without a broker account.</li>
+      <li>Proof-of-reserve + Token-2022 transfer hook is the correct compliance primitive if they mean wallet-level KYC on spAssets.</li>
+      <li>Senior/Junior split (~9% / ~32% in docs) is more honest than a single “double-digit APY” headline — once you find the docs.</li>
+    </ul>
+
+    <h2 id="bugs">Bugs and UX friction (ranked)</h2>
+
+    <h3>1. “0% interest” is the marketing number, not the borrower cost</h3>
+    <p>FAQ: if a written call expires ITM, the borrower “absorbs the difference between the strike and the market price,” historically “around 0.5% annualized.” That is a borrower cost. It is not interest, but a user comparing Spout to a 5% margin loan will be misled if the UI only prints <code>Borrow APR 0%</code>.</p>
+    <p><strong>Fix:</strong> show an estimated cycle cost / max ITM give-up next to 0% APR, and a one-line “you sold a call on your shares.” JEPI/QYLD comparison belongs in an advanced drawer; those funds have NAV erosion for a reason.</p>
+
+    <h3 id="http">2. Three live hostnames, production 522/403, docs UA-gated, one unresolvable URL</h3>
+    <p>Checked 2026-09-09 from this session. Docs tell testers to “Visit app.spout.finance”. That host flaps 522/403. Demo and beta are the same 12,634-byte bundle. Their own <code>llms-full.txt</code> still links <code>https://https://beta.spout.finance/</code> (DNS fail).</p>
+    <table>
+      <thead>
+        <tr><th>Time (UTC)</th><th>UA</th><th>URL</th><th>Result</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>~10:37</td><td>default</td><td>https://app.spout.finance/</td><td class="bad">HTTP 522</td></tr>
+        <tr><td>~10:41</td><td>Python urllib</td><td>https://app.spout.finance/</td><td class="bad">HTTP 403</td></tr>
+        <tr><td>~10:41</td><td>Chrome</td><td>https://app.spout.finance/</td><td class="bad">HTTP 522</td></tr>
+        <tr><td>~10:47</td><td>Python urllib</td><td>https://app.spout.finance/</td><td class="bad">HTTP 403</td></tr>
+        <tr><td>~10:47</td><td>Chrome</td><td>https://app.spout.finance/</td><td class="bad">HTTP 522</td></tr>
+        <tr><td>~10:37 / 10:47</td><td>both</td><td>https://demo.spout.finance/</td><td class="ok">200, 12,634 bytes</td></tr>
+        <tr><td>~10:37 / 10:47</td><td>both</td><td>https://beta.spout.finance/</td><td class="ok">200, same 12,634 bytes as demo</td></tr>
+        <tr><td>~10:37</td><td>—</td><td>https://https://beta.spout.finance/</td><td class="bad">DNS fail (doubled https in llms-full)</td></tr>
+        <tr><td>~10:47</td><td>Python urllib</td><td>https://spout.finance/docs/getting-started</td><td class="bad">HTTP 403</td></tr>
+        <tr><td>~10:47</td><td>Chrome</td><td>https://spout.finance/docs/getting-started</td><td class="ok">200, 8,744 bytes</td></tr>
+        <tr><td>~10:47</td><td>both</td><td>https://www.spout.finance/</td><td class="ok">200, 15,273 bytes</td></tr>
+      </tbody>
+    </table>
+    <p>New in this pass: getting-started docs are <strong>user-agent gated</strong> (403 to urllib, 200 to Chrome). Superteam agents and anyone fetching docs without a browser UA cannot read Path B. llms-full still contains the doubled URL (confirmed 219,569 bytes, 7× <code>beta.spout.finance</code>, 0× <code>app.spout.finance</code>, 0× <code>demo.spout.finance</code>).</p>
+    <p><strong>Fix the origin</strong>, the double-https, the docs WAF, and put one canonical “start here” URL on the listing and the homepage. There is no separate live testnet surface from these public URLs.</p>
+
+    <h3>3. KYC story disagrees with itself</h3>
+    <p>Homepage FAQ “How do I get started?”: connect wallet, <strong>complete KYC</strong>, then deposit.</p>
+    <p>Docs getting-started Path B: deposit existing tokenized equities, <strong>no KYC through Spout</strong>.</p>
+    <p>If Path B is real, the homepage buries the only path Superteam testers can use. If Path B is stale, the docs are lying. Pick one.</p>
+
+    <h3>4. Lockups vs “withdraw whenever”</h3>
+    <p>Homepage: “There are no lockups on either side.” Getting started: lock collateral to enroll in the <strong>weekly options cycle</strong>; lenders get distributions <strong>every Monday</strong>.</p>
+    <p>Covered-call overwriting has a cycle. Either withdrawals mid-cycle are delayed / haircut, or they are not writing the calls they claim. The UI must say what happens if a borrower unlocks Tuesday.</p>
+
+    <h3>5. Health Factor copy is dangerous</h3>
+    <p>Docs: “There is no cost to being close to the line, and no cost to being far from it.”</p>
+    <p>That is false in a gap-down. Close to HF 1.00 means a smaller buffer before partial liquidation. If notifications exist, the empty demo does not show them. <strong>Fix:</strong> show HF, liquidation price, and “buffer vs last print” on the position card, not a sentence that closeness is free.</p>
+
+    <h3>6. Demo buy flow is a brochure, not a protocol</h3>
+    <p><code>demo.spout.finance</code> shows NVDA at a round <code>$170.00</code>, 2.79%, 1x–2x leverage chips, and “Connect Wallet.” There is no live oracle timestamp, no proof-of-reserve number on the first screen (the buy page later says “Reserves 100.2%” with no tx or slot), no testnet faucet, no invite-code field. A Superteam “actual product usage” judge cannot tell demo from production.</p>
+
+    <h3>7. Leverage chips vs 50% LTV</h3>
+    <p>Demo offers 1.25x–2x. 2x on a long is 50% margin, which matches 50% LTV — but “leverage” on a buy ticket is not the same mental model as “borrow 50% against shares you already hold.” New users will think they are perping NVDA. Label it “borrow against this buy” or drop the 2x chip from the purchase ticket.</p>
+
+    <h3>8. Senior APY vs “double-digit”</h3>
+    <p>Homepage: lenders earn “double-digit yield.” Docs: Senior ~9% (single digit), Junior ~32% first-loss.</p>
+    <p>If most deposits go Senior, the headline is wrong. If Junior is the default, the risk is under-disclosed.</p>
+
+    <h3>9. Transfer-hook KYC vs Path B</h3>
+    <p>llms.txt: spAssets use Token-2022 transfer hooks that enforce wallet-level KYC. Path B: xStocks/Ondo deposits need no Spout KYC.</p>
+    <p>If a transfer hook fires on <em>every</em> spAsset move, Path B still needs the destination wallet on a KYC allowlist. Document that, or testers will report “deposit failed: hook” as a bug.</p>
+
+    <h3>10. Un-audited Monte Carlo as a FAQ answer</h3>
+    <p>“Positive net returns in over 99% of simulated years” in a crash FAQ, with no notebook, no seed, no period, no assumption on IV crush. Cut it from the FAQ or link the model.</p>
+
+    <h2 id="defi">DeFi / tokenization analysis</h2>
+    <p>Spout is not competing with Aave USDC supply (~3.3%) against T-bills (~3.7%). It is competing with (a) selling the stock, (b) a broker margin loan, (c) Kamino/Jupiter xStocks lending, (d) JEPI-style overwriting ETFs.</p>
+    <p>The only edge that is actually new on Solana is <strong>0% cash interest funded by selling calls on the borrower’s equity</strong>, with Token-2022 KYC. That edge dies if option assignment is not explained as a cost, weekly cycle lock is hidden, or the oracle/liquidation path is a TWAP that can be dumped (they themselves wrote up Morpho’s $36M TWAP cascade in their roundup).</p>
+    <p>For tokenized equities specifically: 50% LTV on NVDA-like names is aggressive if the oracle is a CEX print plus weekend gap. US equities do not trade 24/7; Solana does. The protocol must say which price it uses Saturday 03:00 UTC and whether liquidations run then.</p>
+    <p>Covered-call premium is <strong>not</strong> free lunch. Implied &gt; realized on average, until it is not (2020, 2022, Aug 2024-style vol spikes). Junior 32% APY is the first-loss slice of that bet. Call it that.</p>
+
+    <h2 id="fix">Product recommendations (priority)</h2>
+    <ol>
+      <li>One URL. Fix <code>https://https://beta.spout.finance/</code>.</li>
+      <li>Stop UA-gating docs. Path B is unreadable to non-browser clients.</li>
+      <li>Replace “0% interest” on the primary ticket with “0% cash APR · options overwrite · est. cycle cost.”</li>
+      <li>Put Path B (existing xStocks, no extra KYC) on the homepage for testers.</li>
+      <li>Show cycle end, unlock rules, and HF + liquidation price on the position.</li>
+      <li>Default Senior for lenders; Junior behind a first-loss warning.</li>
+      <li>Demo: faucet, invite code, oracle age, PoR link, testnet badge. Right now it looks like a static marketing site with a Connect button.</li>
+      <li>Spell out weekend oracle + liquidation hours.</li>
+    </ol>
+
+    <h2>What I could not verify (honest)</h2>
+    <ul>
+      <li>Did not complete KYC or a testnet borrow.</li>
+      <li>Did not inspect the Token-2022 mint or transfer-hook program id.</li>
+      <li>Did not see a live covered-call fill or Monday distribution.</li>
+      <li>Invite-gated beta was not opened in this pass (public beta host is the demo bundle).</li>
+    </ul>
+    <p>Those are the next things I would do with an invite code and a throwaway Phantom on testnet.</p>
+
+    <h2>Suggested Superteam answers</h2>
+    <ul>
+      <li><strong>Major challenge:</strong> gated beta + KYC Path A. Public demo does not prove a testnet borrow. Docs 403 to non-browser UAs.</li>
+      <li><strong>Public content:</strong> this page and <a href="https://github.com/HaydernCenterpoint/spout-finance-teardown">the GitHub repo</a>.</li>
+    </ul>
+  </main>
+  <footer>
+    HaydernCenterpoint · public Superteam artifact · not a paid audit
+  </footer>
+</body>
+</html>
