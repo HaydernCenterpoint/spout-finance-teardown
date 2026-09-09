@@ -28,14 +28,20 @@ FAQ: if a written call expires ITM, the borrower “absorbs the difference betwe
 
 **Fix:** show an estimated cycle cost / max ITM give-up next to 0% APR, and a one-line “you sold a call on your shares.” JEPI/QYLD comparison belongs in an advanced drawer; those funds have NAV erosion for a reason.
 
-### 2. Three live hostnames, one broken URL
+### 2. Three live hostnames, production 522, one unresolvable URL
 
-- Marketing and docs: `app.spout.finance`
-- Demo: `demo.spout.finance`
-- Blog: beta is “live on testnet” at `beta.spout.finance`
-- In their own llms-full post: `[beta](https://https://beta.spout.finance/)` — doubled `https://`. That link is dead.
+Checked 2026-09-09 ~10:37 UTC from this session:
 
-A tester hitting the Superteam brief will not know which URL is the gated beta vs a static demo vs production. **Fix the double-https**, and put one canonical “start here” URL on the listing and the homepage.
+| URL | Result |
+| --- | --- |
+| https://app.spout.finance/ | **HTTP 522** (Cloudflare origin timeout) |
+| https://demo.spout.finance/ | HTTP 200, 12 634 bytes |
+| https://beta.spout.finance/ | HTTP 200, **same 12 634 bytes as demo** |
+| https://https://beta.spout.finance/ | DNS fail (`getaddrinfo` — doubled `https://` in their llms-full post) |
+
+Docs tell testers to “Visit app.spout.finance”. That host is down. Demo and beta look like the same static bundle (identical length). There is no separate live testnet surface from these public URLs.
+
+**Fix the 522**, the double-https, and put one canonical “start here” URL on the listing and the homepage.
 
 ### 3. KYC story disagrees with itself
 
