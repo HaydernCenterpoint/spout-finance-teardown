@@ -59,14 +59,14 @@
     <h1>Spout Finance beta teardown</h1>
     <p class="meta">
       Listing: <a href="https://superteam.fun/earn/listing/product-feedback-spout-finance/">product-feedback-spout-finance</a><br>
-      Deadline: 21 Sep 2026 22:59 UTC · Prizes: 250 / 200 / 150 / 100×4 USDC<br>
+      Deadline: 23 Sep 2026 22:59 UTC · Prizes: 250 / 200 / 150 / 100×4 USDC<br>
       Canonical markdown: <a href="https://github.com/HaydernCenterpoint/spout-finance-teardown/blob/master/REPORT.md">REPORT.md</a>
       · Repo: <a href="https://github.com/HaydernCenterpoint/spout-finance-teardown">HaydernCenterpoint/spout-finance-teardown</a>
     </p>
     <div class="box">
       <strong>Submit this URL on Superteam (logged-in web, HUMAN_ONLY):</strong><br>
       <a href="https://hayderncenterpoint.github.io/spout-finance-teardown/">https://hayderncenterpoint.github.io/spout-finance-teardown/</a>
-      <p style="margin:.6rem 0 0">Eligibility answer: gated beta + KYC Path A. This teardown is from public demo, docs, and marketing contradictions. An invite code would unlock a live testnet borrow.</p>
+      <p style="margin:.6rem 0 0">Eligibility answer: gated beta + KYC Path A. This teardown is from public demo, docs, and marketing contradictions. <code>app.spout.finance</code> timed out at 15:03 UTC (not retried). Getting-started is 200 to urllib as of 15:07. An invite code would unlock a live testnet borrow.</p>
     </div>
     <nav>
       <a href="#good">What is good</a>
@@ -82,7 +82,9 @@
       <a href="https://spout.finance/docs/health-factor">docs/health-factor</a>,
       <a href="https://spout.finance/llms-full.txt">llms-full.txt</a>,
       <a href="https://demo.spout.finance/">demo.spout.finance</a>,
-      <a href="https://beta.spout.finance/">beta.spout.finance</a>.</p>
+      <a href="https://beta.spout.finance/">beta.spout.finance</a>,
+      <a href="https://hub.spout.finance/">hub.spout.finance</a> (Whale Hub).
+      <code>app.spout.finance</code> was not retried after a 15:03 UTC timeout.</p>
     <p>Wallet/KYC: not completed. This is a docs + public-demo audit, not a funded mainnet trade.</p>
 
     <h2>One-line product</h2>
@@ -103,8 +105,8 @@
     <p>FAQ: if a written call expires ITM, the borrower “absorbs the difference between the strike and the market price,” historically “around 0.5% annualized.” That is a borrower cost. It is not interest, but a user comparing Spout to a 5% margin loan will be misled if the UI only prints <code>Borrow APR 0%</code>.</p>
     <p><strong>Fix:</strong> show an estimated cycle cost / max ITM give-up next to 0% APR, and a one-line “you sold a call on your shares.” JEPI/QYLD comparison belongs in an advanced drawer; those funds have NAV erosion for a reason.</p>
 
-    <h3 id="http">2. Three live hostnames, production 522/403, docs UA-gated, one unresolvable URL</h3>
-    <p>Checked 2026-09-09 from this session. Docs tell testers to “Visit app.spout.finance”. That host flaps 522/403. Demo and beta are the same 12,634-byte bundle. Their own <code>llms-full.txt</code> still links <code>https://https://beta.spout.finance/</code> (DNS fail).</p>
+    <h3 id="http">2. Four live hostnames, production app dead, one unresolvable URL</h3>
+    <p>Checked 2026-09-09 from this session. Docs tell testers to “Visit app.spout.finance”. That host 522/403’d all morning and <strong>timed out</strong> at 15:03 UTC (not retried). Demo and beta are still the same 12,634-byte bundle. Their own <code>llms-full.txt</code> still links <code>https://https://beta.spout.finance/</code> (DNS fail).</p>
     <table>
       <thead>
         <tr><th>Time (UTC)</th><th>UA</th><th>URL</th><th>Result</th></tr>
@@ -115,16 +117,20 @@
         <tr><td>~10:41</td><td>Chrome</td><td>https://app.spout.finance/</td><td class="bad">HTTP 522</td></tr>
         <tr><td>~10:47</td><td>Python urllib</td><td>https://app.spout.finance/</td><td class="bad">HTTP 403</td></tr>
         <tr><td>~10:47</td><td>Chrome</td><td>https://app.spout.finance/</td><td class="bad">HTTP 522</td></tr>
-        <tr><td>~10:37 / 10:47</td><td>both</td><td>https://demo.spout.finance/</td><td class="ok">200, 12,634 bytes</td></tr>
-        <tr><td>~10:37 / 10:47</td><td>both</td><td>https://beta.spout.finance/</td><td class="ok">200, same 12,634 bytes as demo</td></tr>
+        <tr><td>~15:03</td><td>Python urllib</td><td>https://app.spout.finance/</td><td class="bad">TimeoutError (not retried)</td></tr>
+        <tr><td>~10:37 / 10:47 / 15:07</td><td>urllib</td><td>https://demo.spout.finance/</td><td class="ok">200, 12,634 bytes</td></tr>
+        <tr><td>~10:37 / 10:47 / 15:07</td><td>urllib</td><td>https://beta.spout.finance/</td><td class="ok">200, same 12,634 bytes as demo</td></tr>
         <tr><td>~10:37</td><td>—</td><td>https://https://beta.spout.finance/</td><td class="bad">DNS fail (doubled https in llms-full)</td></tr>
         <tr><td>~10:47</td><td>Python urllib</td><td>https://spout.finance/docs/getting-started</td><td class="bad">HTTP 403</td></tr>
         <tr><td>~10:47</td><td>Chrome</td><td>https://spout.finance/docs/getting-started</td><td class="ok">200, 8,744 bytes</td></tr>
-        <tr><td>~10:47</td><td>both</td><td>https://www.spout.finance/</td><td class="ok">200, 15,273 bytes</td></tr>
+        <tr><td>~15:07</td><td>Python urllib</td><td>https://spout.finance/docs/getting-started/</td><td class="ok">200, 8,377 bytes (UA-gate lifted)</td></tr>
+        <tr><td>~15:07</td><td>Python urllib</td><td>https://spout.finance/docs/health-factor</td><td class="ok">200, 6,532 bytes</td></tr>
+        <tr><td>~10:47 / 15:07</td><td>urllib</td><td>https://www.spout.finance/</td><td class="ok">200, 15,273 bytes</td></tr>
+        <tr><td>~15:07</td><td>Python urllib</td><td>https://hub.spout.finance/</td><td class="ok">200, 1,103 bytes, title Whale Hub</td></tr>
       </tbody>
     </table>
-    <p>New in this pass: getting-started docs are <strong>user-agent gated</strong> (403 to urllib, 200 to Chrome). Superteam agents and anyone fetching docs without a browser UA cannot read Path B. llms-full still contains the doubled URL (confirmed 219,569 bytes, 7× <code>beta.spout.finance</code>, 0× <code>app.spout.finance</code>, 0× <code>demo.spout.finance</code>).</p>
-    <p><strong>Fix the origin</strong>, the double-https, the docs WAF, and put one canonical “start here” URL on the listing and the homepage. There is no separate live testnet surface from these public URLs.</p>
+    <p>Getting-started Path A / Path B copy is intact and is now readable to a non-browser UA (403 at 10:47, 200 at 15:07). <code>llms-full.txt</code> is 219,569 characters / 220,484 UTF-8 bytes — same character count as morning — and still contains the doubled URL (2× <code>https://https://beta.spout.finance/</code>, 7× <code>beta.spout.finance</code>, 0× <code>app.spout.finance</code>, 0× <code>demo.spout.finance</code>). It does mention <code>hub.spout.finance</code> (an application-only “Whale Hub” SPA).</p>
+    <p><strong>Fix the origin</strong>, the double-https, and put one canonical “start here” URL on the listing and the homepage. Do not send testers to a host that 522s / 403s / times out.</p>
 
     <h3>3. KYC story disagrees with itself</h3>
     <p>Homepage FAQ “How do I get started?”: connect wallet, <strong>complete KYC</strong>, then deposit.</p>
@@ -165,7 +171,7 @@
     <h2 id="fix">Product recommendations (priority)</h2>
     <ol>
       <li>One URL. Fix <code>https://https://beta.spout.finance/</code>.</li>
-      <li>Stop UA-gating docs. Path B is unreadable to non-browser clients.</li>
+      <li>Keep docs ungated. Getting-started flipped 403→200 for urllib between 10:47 and 15:07; don’t flap it back.</li>
       <li>Replace “0% interest” on the primary ticket with “0% cash APR · options overwrite · est. cycle cost.”</li>
       <li>Put Path B (existing xStocks, no extra KYC) on the homepage for testers.</li>
       <li>Show cycle end, unlock rules, and HF + liquidation price on the position.</li>
@@ -185,7 +191,7 @@
 
     <h2>Suggested Superteam answers</h2>
     <ul>
-      <li><strong>Major challenge:</strong> gated beta + KYC Path A. Public demo does not prove a testnet borrow. Docs 403 to non-browser UAs.</li>
+      <li><strong>Major challenge:</strong> gated beta + KYC Path A. Public demo does not prove a testnet borrow. <code>app.spout.finance</code> 522/403 this morning and TimeoutError at 15:03 UTC (not retried). Docs getting-started is 200 to urllib as of 15:07.</li>
       <li><strong>Public content:</strong> this page and <a href="https://github.com/HaydernCenterpoint/spout-finance-teardown">the GitHub repo</a>.</li>
     </ul>
   </main>
